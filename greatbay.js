@@ -11,7 +11,7 @@ var connection = mysql.createConnection({
     user: "root",
 
     // Your password
-    password: "MyPassword",
+    password: "@Lph@20!!",
     database: "playlist_db"
 });
 
@@ -121,3 +121,5 @@ function greatBay() {
 
         });
 }
+
+greatBay();
