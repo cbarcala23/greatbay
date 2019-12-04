@@ -8,7 +8,7 @@ CREATE TABLE items (
   id INT NOT NULL AUTO_INCREMENT,
   item VARCHAR(45) NULL,
   category VARCHAR(45) NULL,
-  bidAmount VARCHAR(45) NULL,  
+  bidAmount INT NULL,  
   PRIMARY KEY (id)
 );
 
