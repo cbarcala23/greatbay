@@ -12,24 +12,11 @@ var connection = mysql.createConnection({
 
     // Your password
     password: "MyPassword",
-    database: "playlist_db"
+    database: "item_informationDB"
 });
 
-connection.connect(function (err) {
-    if (err) throw err;
-    console.log("connected as id " + connection.threadId);
-    afterConnection();
-});
 
-function afterConnection() {
-    connection.query("SELECT * FROM songs", function (err, res) {
-        if (err) throw err;
-        console.log(res);
-        connection.end();
-    });
-}
-
-//mysql -uroot -p < ./playlist.sql
+//mysql -uroot -p < ./itemInform.sql
 
 const postQ = [
     {
@@ -51,20 +38,39 @@ const postQ = [
 
 const bidQ = [
     {
-        type: "input",
+        type: "rawlist",
         message: "Choose an item",
         name: "choice",
     },
     {
         type: "input",
         message: "Bid Amount:",
-        name: "amount"
+        name: "bidAmount"
     },
 ];
 
-function updateItems() {
+// function updateItems() {
+//     console.log("Updating available posts\n");
+//     var query = connection.query(
+//         "UPDATE products SET ? WHERE ?",
+//         [
+//             {
+//                 quantity: 100
+//             },
+//             {
+//                 flavor: "Rocky Road"
+//             }
+//         ],
+//         function (err, res) {
+//             if (err) throw err;
+//             console.log(res.affectedRows + " products updated!\n");
+//         }
+//     );
 
-}
+//     // logs the actual query being run
+//     console.log(query.sql);
+// }
+
 
 function promptPOST() {
     inquirer
@@ -76,16 +82,41 @@ function promptPOST() {
                 {
                     item: input.item,
                     category: input.category,
-                    amount: input.amount
+                    bidAmount: input.bidAmount
                 },
                 function (err, res) {
                     if (err) throw err;
-                    console.log(res.affectedRows + " product inserted!\n");
-                    updateItems();
+                    console.log(res.affectedRows + " Items Inserted!\n");
+                    // updateItems();
                 })
+                console.log(query.sql);
             greatBay();
         });
 }
+
+function promptBID() {
+    connection.query("SELECT * FROM items", function(err, res) {
+      if (err) throw err;
+      console.log(res);
+      //connection.end();
+      inquirer
+      .prompt(bidQ)
+      .then(function (input) {
+          //console.log(“Inserting a new product...\n”);
+          var query = connection.query(
+              "SELECT * FROM items WHERE ?",
+              {
+                  item: input.item,
+              },
+              function (err, res) {
+                  if (err) throw err;
+                  console.log(res.affectedRows + " product inserted!\n");
+                  updateItems();
+              })
+          greatBay();
+      });
+    });
+  }
 
 
 function greatBay() {
@@ -114,10 +145,10 @@ function greatBay() {
                 promptBID();
             }
             else if (input.action === "END") {
-
-
-                return;
+                connection.end();
             }
 
         });
 }
+
+greatBay();
